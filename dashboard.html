@@ -1505,14 +1505,15 @@ function updateHeaderDashboard() {
 // ==========================================
 // --- LOGIKA MENU INPUT NILAI KARAKTER (KHUSUS WALI & WAKIL WALI KELAS) ---
 // ==========================================
-const tombolKarakter = document.getElementById('menu-input-karakter');
+function cekAksesKarakter() {
+    const tombolKarakter = document.getElementById('menu-input-karakter');
+    if (!tombolKarakter) return;
 
-if (tombolKarakter) {
-    // Pengecekan aman agar tidak eror jika variabel belum terdefinisi
-    const teksJabatan = (typeof stringCekJabatan !== 'undefined' ? stringCekJabatan : '').toUpperCase();
+    // Ambil data jabatan jika variabel sudah siap
+    const jabatan = (typeof stringCekJabatan !== 'undefined' && stringCekJabatan) ? stringCekJabatan : '';
 
-    if (teksJabatan.includes("WALI KELAS")) {
-        tombolKarakter.style.display = "block"; 
+    if (jabatan.toUpperCase().includes("WALI KELAS")) {
+        tombolKarakter.style.display = "block";
     } else {
         tombolKarakter.style.display = "none";
     }
