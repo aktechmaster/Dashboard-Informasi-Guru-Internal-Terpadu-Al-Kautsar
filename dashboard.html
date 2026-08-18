@@ -1502,7 +1502,19 @@ function updateHeaderDashboard() {
             document.getElementById("modalPeringatan").style.display = "none";
         }
 
+// ==========================================
+// --- LOGIKA MENU INPUT NILAI KARAKTER (KHUSUS WALI & WAKIL WALI KELAS) ---
+// ==========================================
+const tombolKarakter = document.getElementById('menu-input-karakter');
 
+if (tombolKarakter) {
+    // Pengecekan kata "WALI KELAS" otomatis mencakup "WALI KELAS" dan "WAKIL WALI KELAS"
+    if (stringCekJabatan.includes("WALI KELAS")) {
+        tombolKarakter.style.display = "block"; // Ubah ke "flex" jika desain CSS kamu menggunakan flex
+    } else {
+        tombolKarakter.style.display = "none";
+    }
+}
         // ============================================
         // FUNGSI BUKA LAPORAN (VERSI TERBARU - 6 POIN)
         // ============================================
