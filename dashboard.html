@@ -1508,9 +1508,11 @@ function updateHeaderDashboard() {
 const tombolKarakter = document.getElementById('menu-input-karakter');
 
 if (tombolKarakter) {
-    // Pengecekan kata "WALI KELAS" otomatis mencakup "WALI KELAS" dan "WAKIL WALI KELAS"
-    if (stringCekJabatan.includes("WALI KELAS")) {
-        tombolKarakter.style.display = "block"; // Ubah ke "flex" jika desain CSS kamu menggunakan flex
+    // Pengecekan aman agar tidak eror jika variabel belum terdefinisi
+    const teksJabatan = (typeof stringCekJabatan !== 'undefined' ? stringCekJabatan : '').toUpperCase();
+
+    if (teksJabatan.includes("WALI KELAS")) {
+        tombolKarakter.style.display = "block"; 
     } else {
         tombolKarakter.style.display = "none";
     }
