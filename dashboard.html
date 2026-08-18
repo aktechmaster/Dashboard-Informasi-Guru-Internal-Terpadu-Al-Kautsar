@@ -452,6 +452,36 @@
     transform: translateY(-2px);
 }
 
+        /* Styling Tombol Progres T2Q Modern & Curved */
+.btn-progres {
+    width: 100%;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%); /* Gradasi Hijau Emerald */
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 25px; /* Membuat sudut tombol melengkung (curved) */
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Efek Hover Saat Tombol Disentuh Kursor */
+.btn-progres:hover {
+    background: linear-gradient(135deg, #047857 0%, #059669 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.btn-progres:active {
+    transform: translateY(0);
+}
+
     </style>
 </head>
 <body>
