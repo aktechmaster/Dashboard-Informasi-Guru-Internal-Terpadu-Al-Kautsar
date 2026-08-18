@@ -504,10 +504,19 @@
                 <p>Klik untuk input jurnal harian KBM.</p>
             </div>
         
-        <div id="menu-t2q" class="menu-card" onclick="window.open('https://aktechmaster.github.io/SMP_Jurnal-T2Q/')">
-                <h3>📖 Jurnal T2Q</h3>
-                <p>Klik untuk input perkembangan Tahsin & Tahfidz.</p>
-            </div>
+        <!-- Kartu Menu T2Q SMP -->
+    <div id="menu-t2q" class="menu-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div onclick="window.open('https://aktechmaster.github.io/SMP_Jurnal-T2Q/')" style="cursor: pointer;">
+            <h3>📖 Jurnal T2Q</h3>
+            <p>Klik untuk input perkembangan Tahsin & Tahfidz.</p>
+        </div>
+    
+    <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px;">
+        <button id="btn-progres-t2q" class="btn-progres" onclick="bukaProgresT2Q(event)">
+            🔍 Lihat Progres T2Q Siswa
+        </button>
+    </div>
+</div>
 
          <div class="menu-card" onclick="bukaJadwalMengajar()">
             <div class="icon-container" style="background: #e1f5fe; color: #0288d1;">
@@ -1904,6 +1913,151 @@ window.addEventListener('click', function(event) {
     if (event.target === modalRincian) {
         tutupRincianJurnal();
     }
+});
+
+        // ==========================================
+// --- LOGIKA OTOMATIS MENU T2Q & PROGRES SISWA (SMP) ---
+// ==========================================
+
+// Ganti dengan URL Deployment GAS SMP Anda
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxsjj_ogUcat2qRUDDcidgzaNNwtzmcl_2LKNuLn5tsAngJUdd7v-e00UaBJz_kK9qQ4A/exec";
+
+// 1. Fungsi Pembantu: Memeriksa Data Guru secara Aman
+function getBioGuru() {
+    if (typeof bio !== 'undefined' && bio) return bio;
+    if (typeof dataGuru !== 'undefined' && dataGuru) return dataGuru;
+    if (typeof userData !== 'undefined' && userData) return userData;
+    try {
+        const localData = localStorage.getItem('user') || localStorage.getItem('bio') || localStorage.getItem('dataGuru');
+        if (localData) return JSON.parse(localData);
+    } catch(e) {}
+    return {};
+}
+
+// 2. Fungsi Pembantu: Mengambil Nama Guru Log In
+function getNamaGuruLogin() {
+    const dataBio = getBioGuru();
+    let nama = dataBio.nama || dataBio.namaLengkap || dataBio.namaGuru || "";
+
+    if (!nama) {
+        const bodyText = document.body.innerText;
+        const match = bodyText.match(/Selamat Datang,?\s*\n?\s*([^\n\r]+)/i);
+        if (match && match[1]) {
+            nama = match[1].trim();
+        }
+    }
+    return nama;
+}
+
+// 3. Inisialisasi Tampilan Tombol T2Q
+function initMenuT2Q() {
+    const tombolT2Q = document.getElementById('menu-t2q');
+    if (tombolT2Q) { 
+        const dataBio = getBioGuru();
+        let mapelGuru = String(dataBio.mataPelajaran || dataBio.mapel || "").toUpperCase();
+
+        if (mapelGuru.includes("T2Q") || mapelGuru.includes("TAHSIN") || mapelGuru.includes("TAHFIDZ") || mapelGuru === "") {
+            tombolT2Q.style.display = "flex"; 
+        } else {
+            tombolT2Q.style.display = "none"; 
+        }
+    }
+}
+
+// 4. Function Buka Modal & Fetch Data Rekap T2Q Siswa (SMP)
+async function bukaProgresT2Q(event) {
+    if (event) event.stopPropagation();
+
+    const modal = document.getElementById('modal-progres-t2q');
+    const modalBody = document.getElementById('modal-body-t2q');
+    
+    if (modal) modal.style.display = 'flex';
+    if (modalBody) modalBody.innerHTML = '<p style="text-align:center; padding: 20px;">⏳ Memuat data progres T2Q siswa SMP...</p>';
+
+    try {
+        // Mengirimkan parameter op=getRekap ke Apps Script SMP
+        const response = await fetch(`${GAS_API_URL}?op=getRekap`);
+        const result = await response.json();
+
+        if (result.status === "success") {
+            const namaGuruLogin = getNamaGuruLogin().toLowerCase().trim();
+
+            // Filter data berdasarkan Pengampu
+            const dataFiltered = result.data.filter(siswa => {
+                const pengampu = (siswa.pengampu || "").toLowerCase().trim();
+                if (!namaGuruLogin || !pengampu) return false;
+                
+                return pengampu.includes(namaGuruLogin) || namaGuruLogin.includes(pengampu);
+            });
+
+            renderTabelProgresT2QSMP(dataFiltered);
+        } else {
+            if (modalBody) modalBody.innerHTML = `<p style="color:red; text-align:center; padding:20px;">Gagal mengambil data: ${result.message}</p>`;
+        }
+    } catch (err) {
+        if (modalBody) modalBody.innerHTML = `<p style="color:red; text-align:center; padding:20px;">Terjadi kesalahan sistem: ${err.message}</p>`;
+    }
+}
+
+// 5. Render Tabel Hasil Filter Siswa (Struktur SMP)
+function renderTabelProgresT2QSMP(data) {
+    const modalBody = document.getElementById('modal-body-t2q');
+    if (!modalBody) return;
+
+    if (data.length === 0) {
+        modalBody.innerHTML = '<p style="text-align:center; color:#777; padding:20px;">Belum ada data progres siswa yang diampu oleh Anda.</p>';
+        return;
+    }
+
+    let htmlTable = `
+        <table class="t2q-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Kelas</th>
+                    <th>Nama Siswa</th>
+                    <th>NISN</th>
+                    <th>Batas Hafalan</th>
+                    <th>Pengampu</th>
+                    <th>Tidak Setor</th>
+                    <th>Tidak Hadir</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    data.forEach((row, index) => {
+        htmlTable += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${row.kelas}</td>
+                <td><b>${row.nama}</b></td>
+                <td>${row.nisn}</td>
+                <td>${row.batasHafalan || '-'}</td>
+                <td>${row.pengampu}</td>
+                <td style="text-align:center;">${row.tidakSetor}</td>
+                <td style="text-align:center;">${row.tidakHadir}</td>
+            </tr>
+        `;
+    });
+
+    htmlTable += `
+            </tbody>
+        </table>
+    `;
+
+    modalBody.innerHTML = htmlTable;
+}
+
+// 6. Function Tutup Modal
+function tutupModalProgresT2Q() {
+    const modal = document.getElementById('modal-progres-t2q');
+    if (modal) modal.style.display = 'none';
+}
+
+// Jalankan inisialisasi menu saat halaman dimuat
+document.addEventListener("DOMContentLoaded", () => {
+    initMenuT2Q();
 });
         
     </script>
