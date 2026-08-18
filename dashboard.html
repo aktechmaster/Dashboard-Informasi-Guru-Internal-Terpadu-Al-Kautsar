@@ -1502,22 +1502,6 @@ function updateHeaderDashboard() {
             document.getElementById("modalPeringatan").style.display = "none";
         }
 
-// ==========================================
-// --- LOGIKA MENU INPUT NILAI KARAKTER (KHUSUS WALI & WAKIL WALI KELAS) ---
-// ==========================================
-function cekAksesKarakter() {
-    const tombolKarakter = document.getElementById('menu-input-karakter');
-    if (!tombolKarakter) return;
-
-    // Ambil data jabatan jika variabel sudah siap
-    const jabatan = (typeof stringCekJabatan !== 'undefined' && stringCekJabatan) ? stringCekJabatan : '';
-
-    if (jabatan.toUpperCase().includes("WALI KELAS")) {
-        tombolKarakter.style.display = "block";
-    } else {
-        tombolKarakter.style.display = "none";
-    }
-}
         // ============================================
         // FUNGSI BUKA LAPORAN (VERSI TERBARU - 6 POIN)
         // ============================================
