@@ -517,6 +517,111 @@
         </button>
     </div>
 </div>
+            <!-- ========================================== -->
+<!-- MODAL / POPUP PROGRES T2Q SISWA -->
+<!-- ========================================== -->
+<div id="modal-progres-t2q" class="modal-t2q-overlay" style="display: none;">
+    <div class="modal-t2q-content">
+        <div class="modal-t2q-header">
+            <h3>🔍 Progres T2Q Siswa (Bimbingan Anda)</h3>
+            <button class="btn-close-t2q" onclick="tutupModalProgresT2Q()">&times;</button>
+        </div>
+        <div id="modal-body-t2q" class="modal-t2q-body">
+            <!-- Tabel data akan dirender secara otomatis di sini via JS -->
+        </div>
+    </div>
+</div>
+
+<!-- STYLING CSS MODAL & TABEL -->
+<style>
+    .modal-t2q-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-t2q-content {
+        background: #ffffff;
+        width: 90%;
+        max-width: 950px;
+        max-height: 85vh;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        overflow: hidden;
+    }
+
+    .modal-t2q-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    .modal-t2q-header h3 {
+        margin: 0;
+        color: #2c3e50;
+    }
+
+    .modal-t2q-body {
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .btn-close-t2q {
+        background: none;
+        border: none;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #777;
+    }
+
+    .btn-close-t2q:hover {
+        color: #e74c3c;
+    }
+
+    /* Style Tabel T2Q */
+    .t2q-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 13px;
+    }
+
+    .t2q-table th, .t2q-table td {
+        border: 1px solid #ddd;
+        padding: 10px 8px;
+        text-align: left;
+    }
+
+    .t2q-table th {
+        background-color: #007bff;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .t2q-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    .t2q-table tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
 
          <div class="menu-card" onclick="bukaJadwalMengajar()">
             <div class="icon-container" style="background: #e1f5fe; color: #0288d1;">
