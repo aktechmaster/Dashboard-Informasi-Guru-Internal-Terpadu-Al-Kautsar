@@ -482,6 +482,32 @@
     transform: translateY(0);
 }
 
+        /* Mengubah kursor saat foto diarah/hover */
+.profile-container {
+    cursor: pointer;
+}
+
+/* Overlay hitam transparan di bagian bawah foto */
+.profile-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    padding: 3px 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Tampilkan overlay saat kursor diarahkan ke foto */
+.profile-container:hover .profile-overlay {
+    opacity: 1;
+}
+
     </style>
 </head>
 <body>
@@ -512,10 +538,23 @@
     </div>
 
     <div class="container">
-        <div class="welcome-card">
-            <div class="profile-container">
-                <img id="dash-foto" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Foto Profil" class="profile-img">
+    <div class="welcome-card">
+        
+        <!-- Tambahkan event onclick dan title -->
+        <div class="profile-container" onclick="document.getElementById('input-foto-profil').click()" title="Klik untuk ubah foto">
+            <img id="dash-foto" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Foto Profil" class="profile-img">
+            
+            <!-- Overlay tulisan / tombol ubah -->
+            <div class="profile-overlay">
+                <span>📷 Ubah</span>
             </div>
+        </div>
+
+        <!-- Input File Tersembunyi (Disisipkan tepat di bawah/dekat profile-container) -->
+        <input type="file" id="input-foto-profil" accept="image/*" style="display: none;" onchange="prosesUploadFoto(this)">
+
+    </div>
+</div>
 
             <div class="welcome-content">
                 <h1 class="welcome-title">Selamat Datang,</h1>
@@ -1368,6 +1407,74 @@ function updateHeaderDashboard() {
     } else {
         imgElement.src = defaultFoto;
     }
+
+    function prosesUploadFoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    // Validasi Ukuran File (Maksimal 2 MB)
+    if (file.size > 2 * 1024 * 1024) {
+        alert("Ukuran foto terlalu besar! Maksimal 2 MB.");
+        input.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+    const imgElement = document.getElementById('dash-foto');
+    const fotoLamaSrc = imgElement.src;
+
+    reader.onload = function(e) {
+        const dataURI = e.target.result;
+        
+        // Tampilkan preview sementara di tampilan web
+        imgElement.src = dataURI;
+
+        if (!confirm("Apakah Anda yakin ingin mengganti foto profil?")) {
+            imgElement.src = fotoLamaSrc; // Revert jika batal
+            input.value = "";
+            return;
+        }
+
+        // Siapkan data untuk dikirim ke doPost di GAS
+        const formData = new URLSearchParams();
+        formData.append("action", "uploadFoto");
+        formData.append("nama", namaGuru);
+        formData.append("dataURI", dataURI);
+        formData.append("mimeType", file.type);
+        formData.append("fileName", "Foto_" + namaGuru + "_" + Date.now());
+
+        // Kirim HTTP POST ke Web App GAS
+        fetch(URL_SCRIPT_GAS, { // <--- SESUAIKAN NAMA VARIABEL URL WEB APP ANDA
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "sukses") {
+                alert("Foto profil berhasil diperbarui!");
+                
+                // Update cache biodata lokal JS
+                if (dataDariSpreadsheet && dataDariSpreadsheet.biodata[namaGuru]) {
+                    dataDariSpreadsheet.biodata[namaGuru].foto = data.url;
+                }
+                
+                // Render ulang header
+                updateHeaderDashboard();
+            } else {
+                alert("Gagal mengunggah foto: " + data.pesan);
+                imgElement.src = fotoLamaSrc;
+            }
+            input.value = "";
+        })
+        .catch(err => {
+            alert("Terjadi kesalahan jaringan/sistem: " + err);
+            imgElement.src = fotoLamaSrc;
+            input.value = "";
+        });
+    };
+
+    reader.readAsDataURL(file);
+}
 
     // ==========================================
     // --- LOGIKA MENU KHUSUS WAKA ---
